@@ -577,7 +577,16 @@ button, input, textarea {
   box-shadow: var(--shadow-sm);
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  justify-content: flex-start;
+}
+
+.education-card .card-title {
+  margin-bottom: 1.5rem;
+}
+
+.bio-card {
+  display: flex;
+  flex-direction: column;
 }
 
 .card-title {
@@ -603,7 +612,7 @@ button, input, textarea {
   display: flex;
   flex-wrap: wrap;
   gap: 0.5rem;
-  margin-top: 1.25rem;
+  margin-top: auto;
   padding-top: 1.25rem;
   border-top: 1px solid var(--border-color);
 }
