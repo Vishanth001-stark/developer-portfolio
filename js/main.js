@@ -1,96 +1,84 @@
 /**
- * Vishanth R — Developer Portfolio
- * Main Application Logic
- * 
- * Features:
- * 1. Dark/Light Theme Switching with localStorage persistence
- * 2. Mobile Navigation Drawer with backdrop/outside click support
- * 3. Dynamic Projects Rendering, Category Filter Pills & Real-time Search
- * 4. Project Detail Modal with Overview, Architecture & Quick Start
- * 5. One-Click Copy-to-Clipboard for Contact Info
- * 6. Validated Asynchronous Contact Form
- * 7. Scroll Spy Navigation Highlighting
- * 8. Smooth Toast Notifications
+ * Vishanth R — Digital Identity & Editorial Portfolio
+ * Main Interactive Controllers & Case Study Subsystem
  */
 
 document.addEventListener("DOMContentLoaded", () => {
-  initTheme();
+  initStickyHeader();
   initMobileNav();
-  initProjects();
-  initProjectModal();
-  initCopyButtons();
+  initProjectControls();
+  initCaseStudyModal();
+  initCopySubsystem();
   initContactForm();
   initScrollSpy();
 });
 
 /* ==========================================================================
-   1. Theme Management (Dark / Light)
+   01. Sticky Header Transition on Scroll
    ========================================================================== */
-function initTheme() {
-  const themeToggle = document.getElementById("theme-toggle");
-  const htmlRoot = document.documentElement;
+function initStickyHeader() {
+  const header = document.getElementById("navbar");
+  if (!header) return;
 
-  const savedTheme = localStorage.getItem("vr_theme") || "dark";
-  htmlRoot.setAttribute("data-theme", savedTheme);
-
-  if (themeToggle) {
-    themeToggle.addEventListener("click", () => {
-      const currentTheme = htmlRoot.getAttribute("data-theme");
-      const targetTheme = currentTheme === "dark" ? "light" : "dark";
-      htmlRoot.setAttribute("data-theme", targetTheme);
-      localStorage.setItem("vr_theme", targetTheme);
-      showToast(`Switched to ${targetTheme} mode`, "success");
-    });
+  function onScroll() {
+    if (window.scrollY > 40) {
+      header.classList.add("scrolled");
+    } else {
+      header.classList.remove("scrolled");
+    }
   }
+
+  window.addEventListener("scroll", onScroll, { passive: true });
+  onScroll();
 }
 
 /* ==========================================================================
-   2. Mobile Navigation
+   02. Mobile Navigation Drawer
    ========================================================================== */
 function initMobileNav() {
-  const mobileToggle = document.getElementById("mobile-toggle");
-  const navMenu = document.getElementById("nav-menu");
-  const navLinks = document.querySelectorAll(".nav-link");
+  const toggle = document.getElementById("mobile-toggle");
+  const menu = document.getElementById("nav-menu");
+  const links = document.querySelectorAll(".nav-link");
 
-  if (!mobileToggle || !navMenu) return;
+  if (!toggle || !menu) return;
 
-  mobileToggle.addEventListener("click", () => {
-    const isOpen = navMenu.classList.toggle("open");
-    mobileToggle.setAttribute("aria-expanded", isOpen ? "true" : "false");
+  toggle.addEventListener("click", () => {
+    const isOpen = menu.classList.toggle("open");
+    toggle.setAttribute("aria-expanded", isOpen ? "true" : "false");
   });
 
-  navLinks.forEach((link) => {
+  links.forEach((link) => {
     link.addEventListener("click", () => {
-      if (navMenu.classList.contains("open")) {
-        navMenu.classList.remove("open");
-        mobileToggle.setAttribute("aria-expanded", "false");
+      if (menu.classList.contains("open")) {
+        menu.classList.remove("open");
+        toggle.setAttribute("aria-expanded", "false");
       }
     });
   });
 
   document.addEventListener("click", (e) => {
     if (
-      navMenu.classList.contains("open") &&
-      !navMenu.contains(e.target) &&
-      !mobileToggle.contains(e.target)
+      menu.classList.contains("open") &&
+      !menu.contains(e.target) &&
+      !toggle.contains(e.target)
     ) {
-      navMenu.classList.remove("open");
-      mobileToggle.setAttribute("aria-expanded", "false");
+      menu.classList.remove("open");
+      toggle.setAttribute("aria-expanded", "false");
     }
   });
 }
 
 /* ==========================================================================
-   3. Dynamic Projects Rendering, Filtering & Search
+   03. Project Controls (Filter & Real-Time Search)
    ========================================================================== */
 let activeFilter = "all";
 let searchQuery = "";
 
-function initProjects() {
+function initProjectControls() {
   const filterContainer = document.getElementById("filter-buttons");
   const searchInput = document.getElementById("project-search");
+  const workItems = document.querySelectorAll(".work-item");
 
-  // Render Filter Buttons with dynamic counts
   if (filterContainer && typeof filterCategories !== "undefined" && typeof projectsData !== "undefined") {
     filterContainer.innerHTML = filterCategories
       .map((cat) => {
@@ -113,100 +101,48 @@ function initProjects() {
         filterContainer.querySelectorAll(".filter-btn").forEach((b) => b.classList.remove("active"));
         btn.classList.add("active");
         activeFilter = btn.getAttribute("data-filter") || "all";
-        renderProjects();
+        applyFilters();
       });
     });
   }
 
-  // Real-time Search Event
   if (searchInput) {
     searchInput.addEventListener("input", (e) => {
       searchQuery = e.target.value.toLowerCase().trim();
-      renderProjects();
+      applyFilters();
     });
   }
 
-  renderProjects();
-}
+  function applyFilters() {
+    workItems.forEach((item) => {
+      const projId = item.getAttribute("data-id");
+      const projData = (typeof projectsData !== "undefined")
+        ? projectsData.find((p) => p.id === projId)
+        : null;
 
-function renderProjects() {
-  const container = document.getElementById("projects-container");
-  if (!container || typeof projectsData === "undefined") return;
+      if (!projData) return;
 
-  const filtered = projectsData.filter((project) => {
-    const matchesCategory = activeFilter === "all" || project.category === activeFilter;
-    const matchesSearch =
-      searchQuery === "" ||
-      project.title.toLowerCase().includes(searchQuery) ||
-      project.summary.toLowerCase().includes(searchQuery) ||
-      project.badge.toLowerCase().includes(searchQuery) ||
-      project.technologies.some((tech) => tech.toLowerCase().includes(searchQuery));
+      const matchesCat = activeFilter === "all" || projData.category === activeFilter;
+      const matchesSearch =
+        searchQuery === "" ||
+        projData.title.toLowerCase().includes(searchQuery) ||
+        projData.summary.toLowerCase().includes(searchQuery) ||
+        projData.discipline.toLowerCase().includes(searchQuery) ||
+        projData.technologies.some((t) => t.toLowerCase().includes(searchQuery));
 
-    return matchesCategory && matchesSearch;
-  });
-
-  if (filtered.length === 0) {
-    container.innerHTML = `
-      <div style="grid-column: 1 / -1; padding: 3rem 1.5rem; text-align: center; background: var(--bg-card); border: 1px dashed var(--border-color); border-radius: var(--radius-md);">
-        <p style="color: var(--text-muted); font-size: 0.95rem;">No projects found matching "${escapeHtml(searchQuery)}".</p>
-      </div>
-    `;
-    return;
+      if (matchesCat && matchesSearch) {
+        item.classList.remove("hidden");
+      } else {
+        item.classList.add("hidden");
+      }
+    });
   }
-
-  container.innerHTML = filtered
-    .map(
-      (proj) => `
-      <article class="project-card" data-id="${proj.id}">
-        <div>
-          <div class="project-top">
-            <span class="project-badge">${escapeHtml(proj.badge)}</span>
-          </div>
-          <h3 class="project-title">${escapeHtml(proj.title)}</h3>
-          <p class="project-summary">${escapeHtml(proj.summary)}</p>
-          <div class="project-tech">
-            ${proj.technologies.map((t) => `<span class="tech-chip">${escapeHtml(t)}</span>`).join("")}
-          </div>
-        </div>
-        <div class="project-actions">
-          <button class="btn btn-primary btn-sm view-details-btn" data-id="${proj.id}">
-            <span>View Details</span>
-          </button>
-          ${
-            proj.github
-              ? `<a href="${proj.github}" target="_blank" rel="noopener noreferrer" class="btn btn-outline btn-sm" aria-label="GitHub Repository">
-                  <span>Code ↗</span>
-                </a>`
-              : ""
-          }
-        </div>
-      </article>
-    `
-    )
-    .join("");
-
-  // Attach modal trigger listeners
-  container.querySelectorAll(".view-details-btn").forEach((btn) => {
-    btn.addEventListener("click", (e) => {
-      e.stopPropagation();
-      const projId = btn.getAttribute("data-id");
-      if (projId) openProjectModal(projId);
-    });
-  });
-
-  container.querySelectorAll(".project-card").forEach((card) => {
-    card.addEventListener("click", (e) => {
-      if (e.target.closest("a") || e.target.closest("button")) return;
-      const projId = card.getAttribute("data-id");
-      if (projId) openProjectModal(projId);
-    });
-  });
 }
 
 /* ==========================================================================
-   4. Project Detail Modal
+   04. Case Study Modal Subsystem
    ========================================================================== */
-function initProjectModal() {
+function initCaseStudyModal() {
   const modal = document.getElementById("project-modal");
   const closeBtn = document.getElementById("modal-close");
   const backdrop = document.getElementById("modal-backdrop");
@@ -227,9 +163,50 @@ function initProjectModal() {
       closeModal();
     }
   });
+
+  // Attach triggers for Case Study buttons
+  document.querySelectorAll(".open-case-study").forEach((btn) => {
+    btn.addEventListener("click", (e) => {
+      e.preventDefault();
+      const projId = btn.getAttribute("data-id");
+      if (projId) openCaseStudy(projId);
+    });
+  });
+
+  // Attach triggers for Visual schematics/diagrams
+  document.querySelectorAll(".work-visual").forEach((vis) => {
+    const parent = vis.closest(".work-item");
+    if (parent) {
+      const projId = parent.getAttribute("data-id");
+      vis.addEventListener("click", () => {
+        if (projId) openCaseStudy(projId);
+      });
+      vis.addEventListener("keydown", (e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          if (projId) openCaseStudy(projId);
+        }
+      });
+    }
+  });
+
+  // Attach triggers for Project Index rows
+  document.querySelectorAll(".project-index-item").forEach((row) => {
+    row.addEventListener("click", () => {
+      const projId = row.getAttribute("data-id");
+      if (projId) openCaseStudy(projId);
+    });
+    row.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+        const projId = row.getAttribute("data-id");
+        if (projId) openCaseStudy(projId);
+      }
+    });
+  });
 }
 
-function openProjectModal(projectId) {
+function openCaseStudy(projectId) {
   const modal = document.getElementById("project-modal");
   const modalBody = document.getElementById("modal-body");
   if (!modal || !modalBody || typeof projectsData === "undefined") return;
@@ -238,51 +215,115 @@ function openProjectModal(projectId) {
   if (!proj) return;
 
   modalBody.innerHTML = `
-    <span class="modal-badge">${escapeHtml(proj.badge)}</span>
-    <h2 class="modal-title">${escapeHtml(proj.title)}</h2>
-    
-    <p class="modal-desc">${escapeHtml(proj.description)}</p>
-    
-    <h4 class="modal-section-title">Key Accomplishments &amp; Features</h4>
-    <ul class="modal-highlights">
-      ${proj.highlights.map((h) => `<li>${escapeHtml(h)}</li>`).join("")}
-    </ul>
+    <header class="cs-header">
+      <div class="cs-meta">
+        <span class="cs-num">${escapeHtml(proj.index)}</span>
+        <span class="cs-tag">${escapeHtml(proj.discipline)}</span>
+        <span class="cs-tag">·</span>
+        <span class="cs-tag">${escapeHtml(proj.year)}</span>
+      </div>
+      <h2 class="cs-title">${escapeHtml(proj.title)}</h2>
+      <p class="cs-summary">${escapeHtml(proj.summary)}</p>
+    </header>
 
-    <h4 class="modal-section-title">Technologies Employed</h4>
-    <div class="project-tech" style="margin-bottom: 1.5rem;">
-      ${proj.technologies.map((t) => `<span class="tech-chip">${escapeHtml(t)}</span>`).join("")}
-    </div>
+    ${
+      proj.context
+        ? `<section class="cs-section">
+             <h3 class="cs-section-title">01 — Context &amp; Motivation</h3>
+             <p class="cs-body-text">${escapeHtml(proj.context)}</p>
+           </section>`
+        : ""
+    }
+
+    ${
+      proj.problem
+        ? `<section class="cs-section">
+             <h3 class="cs-section-title">02 — The Problem</h3>
+             <p class="cs-body-text">${escapeHtml(proj.problem)}</p>
+           </section>`
+        : ""
+    }
+
+    ${
+      proj.approach
+        ? `<section class="cs-section">
+             <h3 class="cs-section-title">03 — Architectural Approach</h3>
+             <p class="cs-body-text">${escapeHtml(proj.approach)}</p>
+           </section>`
+        : ""
+    }
 
     ${
       proj.architecture
-        ? `<h4 class="modal-section-title">Architecture &amp; Design</h4>
-           <pre class="modal-code-box"><code>${escapeHtml(proj.architecture)}</code></pre>`
+        ? `<section class="cs-section">
+             <h3 class="cs-section-title">04 — System Contracts &amp; Subsystems</h3>
+             <pre class="cs-code-box"><code>${escapeHtml(proj.architecture)}</code></pre>
+           </section>`
+        : ""
+    }
+
+    ${
+      proj.highlights && proj.highlights.length > 0
+        ? `<section class="cs-section">
+             <h3 class="cs-section-title">05 — Key Accomplishments &amp; Features</h3>
+             <ul class="cs-list">
+               ${proj.highlights.map((h) => `<li>${escapeHtml(h)}</li>`).join("")}
+             </ul>
+           </section>`
+        : ""
+    }
+
+    ${
+      proj.results
+        ? `<section class="cs-section">
+             <h3 class="cs-section-title">06 — Verified Results &amp; Metrics</h3>
+             <p class="cs-body-text">${escapeHtml(proj.results)}</p>
+           </section>`
+        : ""
+    }
+
+    <section class="cs-section">
+      <h3 class="cs-section-title">07 — Technology Stack</h3>
+      <div class="cs-tech-tags">
+        ${proj.technologies.map((t) => `<span class="tech-tag">${escapeHtml(t)}</span>`).join("")}
+      </div>
+    </section>
+
+    ${
+      proj.reflection
+        ? `<section class="cs-section">
+             <h3 class="cs-section-title">08 — Engineering Reflection</h3>
+             <p class="cs-body-text">${escapeHtml(proj.reflection)}</p>
+           </section>`
         : ""
     }
 
     ${
       proj.quickStart
-        ? `<div style="display: flex; justify-content: space-between; align-items: center; margin-top: 1rem; margin-bottom: 0.5rem;">
-             <h4 class="modal-section-title" style="margin: 0;">Quick Start &amp; Run</h4>
-             <button class="btn btn-outline btn-sm copy-code-btn" data-code="${escapeHtml(proj.quickStart)}" title="Copy Commands">Copy</button>
-           </div>
-           <pre class="modal-code-box"><code>${escapeHtml(proj.quickStart)}</code></pre>`
+        ? `<section class="cs-section">
+             <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 0.5rem;">
+               <h3 class="cs-section-title" style="margin: 0;">09 — Quick Start &amp; Run</h3>
+               <button class="copy-action-btn copy-code-btn" data-code="${escapeHtml(proj.quickStart)}">Copy Script</button>
+             </div>
+             <pre class="cs-code-box"><code>${escapeHtml(proj.quickStart)}</code></pre>
+           </section>`
         : ""
     }
 
-    <div style="margin-top: 1.75rem; display: flex; gap: 0.75rem; flex-wrap: wrap; border-top: 1px solid var(--border-color); padding-top: 1.25rem;">
+    <footer class="cs-footer">
       ${
         proj.github
-          ? `<a href="${proj.github}" target="_blank" rel="noopener noreferrer" class="btn btn-primary btn-sm">
-              <span>View GitHub Repository ↗</span>
-            </a>`
+          ? `<a href="${proj.github}" target="_blank" rel="noopener noreferrer" class="action-btn">
+               <span>View Repository on GitHub</span>
+               <span class="arrow">↗</span>
+             </a>`
           : ""
       }
-      <button class="btn btn-secondary btn-sm" id="modal-bottom-close">Close</button>
-    </div>
+      <button class="action-link" id="modal-bottom-close">Close Case Study</button>
+    </footer>
   `;
 
-  // Attach modal bottom close button
+  // Attach bottom close button
   const bottomClose = modalBody.querySelector("#modal-bottom-close");
   if (bottomClose) {
     bottomClose.addEventListener("click", () => {
@@ -299,7 +340,7 @@ function openProjectModal(projectId) {
       const code = copyCodeBtn.getAttribute("data-code");
       if (code && navigator.clipboard) {
         navigator.clipboard.writeText(code).then(() => {
-          showToast("Execution commands copied to clipboard", "success");
+          showToast("Execution script copied to clipboard", "success");
         });
       }
     });
@@ -321,18 +362,18 @@ function escapeHtml(text) {
 }
 
 /* ==========================================================================
-   5. One-Click Copy-to-Clipboard Subsystem
+   05. Copy-to-Clipboard Subsystem
    ========================================================================== */
-function initCopyButtons() {
-  document.querySelectorAll(".copy-btn").forEach((btn) => {
+function initCopySubsystem() {
+  document.querySelectorAll(".copy-action-btn").forEach((btn) => {
     btn.addEventListener("click", (e) => {
       e.preventDefault();
       const textToCopy = btn.getAttribute("data-copy");
       if (textToCopy && navigator.clipboard) {
         navigator.clipboard.writeText(textToCopy).then(() => {
-          showToast(`Copied ${textToCopy} to clipboard!`, "success");
+          showToast(`Copied ${textToCopy} to clipboard`, "success");
         }).catch(() => {
-          showToast("Failed to copy to clipboard", "error");
+          showToast("Failed to copy text", "error");
         });
       }
     });
@@ -340,7 +381,7 @@ function initCopyButtons() {
 }
 
 /* ==========================================================================
-   6. Asynchronous Validated Contact Form
+   06. Validated Asynchronous Contact Form
    ========================================================================== */
 function initContactForm() {
   const form = document.getElementById("contact-form");
@@ -359,17 +400,15 @@ function initContactForm() {
 
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-  function validateInput(input, errorElement, checkFn, errorMsg) {
-    const isValid = checkFn(input.value.trim());
-    if (!isValid) {
-      input.style.borderColor = "var(--error)";
-      errorElement.textContent = errorMsg;
+  function validate(input, errorEl, condition, msg) {
+    if (!condition(input.value.trim())) {
+      input.style.borderColor = "#ff6b6b";
+      errorEl.textContent = msg;
       return false;
-    } else {
-      input.style.borderColor = "";
-      errorElement.textContent = "";
-      return true;
     }
+    input.style.borderColor = "";
+    errorEl.textContent = "";
+    return true;
   }
 
   nameInput.addEventListener("input", () => {
@@ -403,51 +442,27 @@ function initContactForm() {
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
 
-    const isNameValid = validateInput(
-      nameInput,
-      nameError,
-      (val) => val.length >= 2,
-      "Please enter your name (minimum 2 characters)."
-    );
+    const okName = validate(nameInput, nameError, (v) => v.length >= 2, "Name must be at least 2 characters.");
+    const okEmail = validate(emailInput, emailError, (v) => emailRegex.test(v), "Please enter a valid email address.");
+    const okSubject = validate(subjectInput, subjectError, (v) => v.length >= 3, "Subject must be at least 3 characters.");
+    const okMsg = validate(messageInput, messageError, (v) => v.length >= 10, "Message must be at least 10 characters.");
 
-    const isEmailValid = validateInput(
-      emailInput,
-      emailError,
-      (val) => emailRegex.test(val),
-      "Please enter a valid email address."
-    );
-
-    const isSubjectValid = validateInput(
-      subjectInput,
-      subjectError,
-      (val) => val.length >= 3,
-      "Please enter a subject (minimum 3 characters)."
-    );
-
-    const isMessageValid = validateInput(
-      messageInput,
-      messageError,
-      (val) => val.length >= 10,
-      "Please enter a message (minimum 10 characters)."
-    );
-
-    if (!isNameValid || !isEmailValid || !isSubjectValid || !isMessageValid) {
+    if (!okName || !okEmail || !okSubject || !okMsg) {
       showToast("Please correct highlighted fields before submitting.", "error");
       return;
     }
 
     const btnText = submitBtn.querySelector(".btn-text");
-    const originalText = btnText ? btnText.textContent : "Send Message";
-    if (btnText) btnText.textContent = "Sending...";
+    const originalText = btnText ? btnText.textContent : "Transmit Message";
+    if (btnText) btnText.textContent = "Transmitting...";
     submitBtn.disabled = true;
 
     try {
-      // Simulate network request
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      showToast("Thank you! Your message has been sent successfully.", "success");
+      await new Promise((resolve) => setTimeout(resolve, 800));
+      showToast("Message transmitted. Thank you for reaching out.", "success");
       form.reset();
-    } catch (err) {
-      showToast("Transmission error. Please try again or email directly.", "error");
+    } catch {
+      showToast("Transmission error. Please email directly.", "error");
     } finally {
       if (btnText) btnText.textContent = originalText;
       submitBtn.disabled = false;
@@ -456,7 +471,7 @@ function initContactForm() {
 }
 
 /* ==========================================================================
-   7. Toast Notifications
+   07. Toast Notification Utility
    ========================================================================== */
 function showToast(message, type = "success") {
   const container = document.getElementById("toast-container");
@@ -481,7 +496,7 @@ function showToast(message, type = "success") {
 }
 
 /* ==========================================================================
-   8. Scroll Spy Navigation
+   08. Scroll Spy Navigation Highlighting
    ========================================================================== */
 function initScrollSpy() {
   const sections = document.querySelectorAll("section[id]");
@@ -492,7 +507,7 @@ function initScrollSpy() {
 
     sections.forEach((section) => {
       const sectionHeight = section.offsetHeight;
-      const sectionTop = section.offsetTop - 120;
+      const sectionTop = section.offsetTop - 140;
       const sectionId = section.getAttribute("id");
 
       if (scrollY >= sectionTop && scrollY < sectionTop + sectionHeight) {
