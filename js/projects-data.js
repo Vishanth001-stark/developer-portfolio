@@ -5,6 +5,7 @@
 
 const filterCategories = [
   { id: "all", label: "All Works" },
+  { id: "ai", label: "AI & Full-Stack" },
   { id: "java", label: "Java & OOP" },
   { id: "python", label: "Python & Data" },
   { id: "web", label: "Web Systems" },
@@ -14,6 +15,65 @@ const filterCategories = [
 const projectsData = [
   {
     index: "01",
+    id: "trevixa-ai",
+    title: "Trevixa AI — Meeting Intelligence Platform",
+    category: "ai",
+    discipline: "FastAPI · React 19 · Whisper & LLM Pipeline",
+    badge: "Flagship Applied AI",
+    year: "2026",
+    role: "Full-Stack AI Engineer & System Architect",
+    summary: "A production-grade AI meeting intelligence platform that transcribes audio/video recordings with speaker diarization, extracts consensus decisions, and generates actionable task boards with natural language deadline resolution.",
+    description: "Trevixa AI is a production-grade meeting intelligence platform designed to eliminate note-taking fatigue. It ingests multi-format recordings (MP3, WAV, M4A, MP4), normalizes audio with imageio-ffmpeg, runs speech-to-text with speaker diarization across Groq Whisper / OpenAI / Gemini Audio APIs, and executes structured LLM intelligence extraction. It features an interactive synchronized audio player, clickable transcript navigation, consensus decision filtering, natural language deadline resolution, dynamic Recharts analytics, and one-click executive PDF report generation via ReportLab.",
+    context: "Teams across high-growth startups spend countless hours in meetings, yet critical outcomes are frequently lost to note-taking fatigue, resulting in unassigned action items, ambiguous decisions, and inefficient 45-minute recording replays.",
+    problem: "Commercial meeting recorders often suffer from severe hallucination (fabricating consensus or deadlines), lock users into heavy cloud subscriptions, and lack interactive timestamp synchronization between raw audio waveforms and derived task items.",
+    approach: "Engineered an end-to-end decoupled pipeline: a high-performance Python FastAPI backend handling asynchronous audio extraction and multi-provider LLM intelligence pipelines, paired with a modern React 19 / TypeScript frontend. Enforced a strict anti-hallucination mandate with Pydantic v2 schema validation, SQLite/SQLAlchemy relational persistence, automated deadline parsing (e.g., 'by Friday' resolved to absolute calendar dates), and a standalone offline deterministic analyzer.",
+    technologies: ["Python 3.11+", "FastAPI", "React 19", "TypeScript", "Tailwind CSS", "Whisper API", "Llama 3.3 / GPT-4o", "SQLAlchemy", "Recharts", "ReportLab PDF", "Docker", "Pytest (20 Tests)"],
+    highlights: [
+      "Full end-to-end processing pipeline for MP3, WAV, M4A, and MP4 media with local ffmpeg audio extraction.",
+      "Timestamp navigation and interactive audio player synchronized with diarized transcript segments.",
+      "Evidence-based decision extraction filtering out passive chatter in favor of explicit consensus.",
+      "Dynamic action item board with natural language deadline resolution ('by Friday' → calendar dates) and priority filtering.",
+      "Recharts visual analytics for topic distribution donuts and attendee participation bar charts.",
+      "Automated ReportLab executive PDF generation and plain-text transcript exports.",
+      "20 automated unit and integration tests covering schemas, audio validation, persistence, and endpoints (100% passing)."
+    ],
+    results: "Live production deployment on Vercel, sub-second API responses, 20/20 unit and integration tests passing, and zero hallucinations under rigorous schema validation benchmarks.",
+    reflection: "Architecting Trevixa AI illuminated how strict JSON schema constraints and deterministic fallback engines can eliminate non-deterministic LLM hallucinations in mission-critical business intelligence software.",
+    architecture: `// PROCESSING PIPELINE & ARCHITECTURE:
+├── Media Ingestion     -> MP3, WAV, M4A, MP4 via FastAPI multipart streaming (100MB cap)
+├── Audio Extraction   -> Local PCM audio normalization via imageio-ffmpeg
+├── Speech-to-Text      -> Multi-provider STT: Groq Whisper Large v3 / OpenAI Whisper / Local diarizer
+├── Timestamp Alignment -> Segmented word/speaker chunks with millisecond timecode mapping
+├── LLM Intelligence   -> Llama 3.3 / GPT-4o-mini structured JSON extraction via Pydantic v2 schemas
+│   ├── Executive Summary & Strategic Takeaways
+│   ├── Evidence-Based Decisions (Consensus filter)
+│   └── Action Items with Natural Language Date Parser ("by next Monday" -> YYYY-MM-DD)
+├── Relational Storage  -> SQLAlchemy 2.0 ORM with SQLite (meetings, transcripts, decisions, tasks)
+├── Interactive Client  -> React 19 + TypeScript + Vite + Tailwind CSS + Recharts + Synced Audio Player
+└── Executive Export    -> Automated ReportLab 5.0 PDF generation & transcript downloads`,
+    quickStart: `# Clone repository
+git clone https://github.com/Vishanth001-stark/trevixa-ai.git
+cd trevixa-ai
+
+# Backend Setup (FastAPI)
+python -m venv .venv
+.venv\\Scripts\\activate # or source .venv/bin/activate
+pip install -r requirements.txt
+python -m uvicorn backend.main:app --host 127.0.0.1 --port 8000 --reload
+
+# Frontend Setup (React 19 + Vite)
+cd frontend
+npm install
+npm run dev
+
+# Run automated test suite (20 unit tests)
+cd ..
+python -m pytest tests -v`,
+    github: "https://github.com/Vishanth001-stark/trevixa-ai",
+    live: "https://frontend-delta-six-32.vercel.app/"
+  },
+  {
+    index: "02",
     id: "student-management-system",
     title: "Student Management System",
     category: "java",
@@ -61,7 +121,7 @@ run_tests.bat`,
     github: "https://github.com/Vishanth001-stark/student-management-system"
   },
   {
-    index: "02",
+    index: "03",
     id: "expense-budget-tracker",
     title: "Personal Expense & Budget Tracker",
     category: "python",
@@ -104,7 +164,7 @@ python -m unittest test_expense_tracker.py`,
     github: "https://github.com/Vishanth001-stark/expense-budget-tracker"
   },
   {
-    index: "03",
+    index: "04",
     id: "portfolio-platform",
     title: "Personal Developer Digital Identity",
     category: "web",
@@ -140,10 +200,11 @@ cd developer-portfolio
 python -m http.server 8080
 
 # Or open index.html directly in any modern browser!`,
-    github: "https://github.com/Vishanth001-stark/developer-portfolio"
+    github: "https://github.com/Vishanth001-stark/developer-portfolio",
+    live: "https://vishanth001-stark.github.io/developer-portfolio/"
   },
   {
-    index: "04",
+    index: "05",
     id: "algorithmic-problem-solving",
     title: "Competitive Algorithmic Solutions (100+ Solved)",
     category: "dsa",

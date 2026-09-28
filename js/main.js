@@ -311,14 +311,24 @@ function openCaseStudy(projectId) {
     }
 
     <footer class="cs-footer">
-      ${
-        proj.github
-          ? `<a href="${proj.github}" target="_blank" rel="noopener noreferrer" class="action-btn">
-               <span>View Repository on GitHub</span>
-               <span class="arrow">↗</span>
-             </a>`
-          : ""
-      }
+      <div style="display: flex; gap: 0.85rem; flex-wrap: wrap;">
+        ${
+          proj.live
+            ? `<a href="${proj.live}" target="_blank" rel="noopener noreferrer" class="action-btn" style="background-color: var(--accent); color: var(--bg-primary); border-color: var(--accent);">
+                 <span>Launch Live App</span>
+                 <span class="arrow">&#8599;</span>
+               </a>`
+            : ""
+        }
+        ${
+          proj.github
+            ? `<a href="${proj.github}" target="_blank" rel="noopener noreferrer" class="action-btn">
+                 <span>View Repository on GitHub</span>
+                 <span class="arrow">&#8599;</span>
+               </a>`
+            : ""
+        }
+      </div>
       <button class="action-link" id="modal-bottom-close">Close Case Study</button>
     </footer>
   `;

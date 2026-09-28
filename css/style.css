@@ -701,6 +701,145 @@ button:hover .arrow {
   color: var(--text-primary);
 }
 
+.action-btn.live-highlight {
+  background-color: var(--accent);
+  color: var(--bg-primary);
+  border-color: var(--accent);
+  font-weight: 600;
+}
+
+.action-btn.live-highlight:hover {
+  background-color: var(--accent-hover);
+  color: var(--bg-primary);
+  border-color: var(--accent-hover);
+}
+
+/* Composition: AI Processing Pipeline Visual */
+.ai-pipeline-visual {
+  background-color: var(--bg-secondary);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  padding: 2.25rem;
+  cursor: pointer;
+  transition: border-color var(--trans-fast);
+}
+
+.ai-pipeline-visual:hover {
+  border-color: var(--border-strong);
+}
+
+.pipeline-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  margin-bottom: 1.75rem;
+  border-bottom: 1px solid var(--border-subtle);
+  padding-bottom: 0.75rem;
+}
+
+.pipeline-title {
+  color: var(--text-secondary);
+}
+
+.pipeline-badge {
+  color: var(--accent);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.pipeline-badge::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: var(--accent);
+}
+
+.pipeline-flow {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.85rem;
+  margin-bottom: 1.75rem;
+}
+
+.flow-step {
+  background-color: var(--bg-primary);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-xs);
+  padding: 0.95rem 0.8rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.step-num {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  color: var(--accent);
+  letter-spacing: 0.08em;
+}
+
+.step-name {
+  font-size: 0.86rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.step-desc {
+  font-size: 0.73rem;
+  color: var(--text-tertiary);
+  line-height: 1.35;
+  font-family: var(--font-mono);
+}
+
+.pipeline-output-preview {
+  background-color: var(--bg-primary);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-xs);
+  padding: 1.2rem 1.4rem;
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  line-height: 1.6;
+  margin-bottom: 1.5rem;
+}
+
+.preview-row {
+  display: flex;
+  gap: 0.75rem;
+  margin-bottom: 0.4rem;
+}
+
+.preview-row:last-child {
+  margin-bottom: 0;
+}
+
+.preview-label {
+  color: var(--accent);
+  min-width: 100px;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  flex-shrink: 0;
+}
+
+.preview-val {
+  color: var(--text-primary);
+}
+
+.pipeline-footer {
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--text-tertiary);
+  border-top: 1px solid var(--border-subtle);
+  padding-top: 0.75rem;
+}
+
 /* Composition 01: Full-Width Visual Architecture Blueprint */
 .composition-full .work-main {
   display: grid;
@@ -2062,6 +2201,13 @@ button:hover .arrow {
   }
   .cert-status {
     display: none;
+  }
+  .pipeline-flow {
+    grid-template-columns: 1fr;
+  }
+  .preview-row {
+    flex-direction: column;
+    gap: 0.2rem;
   }
   .footer-container {
     flex-direction: column;
