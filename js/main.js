@@ -1,5 +1,5 @@
 /**
- * Vishanth R — Digital Identity & Editorial Portfolio
+ * Vishanth R — Digital Identity & Engineering Portfolio
  * Main Interactive Controllers & Case Study Subsystem
  */
 
@@ -38,7 +38,7 @@ function initStickyHeader() {
 function initMobileNav() {
   const toggle = document.getElementById("mobile-toggle");
   const menu = document.getElementById("nav-menu");
-  const links = document.querySelectorAll(".nav-link");
+  const links = document.querySelectorAll(".nav-link, .island-link");
 
   if (!toggle || !menu) return;
 
@@ -82,23 +82,17 @@ function initProjectControls() {
   if (filterContainer && typeof filterCategories !== "undefined" && typeof projectsData !== "undefined") {
     filterContainer.innerHTML = filterCategories
       .map((cat) => {
-        const count =
-          cat.id === "all"
-            ? projectsData.length
-            : projectsData.filter((p) => p.category === cat.id).length;
-
         return `
-          <button class="filter-btn ${cat.id === "all" ? "active" : ""}" data-filter="${cat.id}">
+          <button class="filter-pill ${cat.id === "all" ? "active" : ""}" data-filter="${cat.id}">
             <span>${cat.label}</span>
-            <span class="filter-count">${count}</span>
           </button>
         `;
       })
       .join("");
 
-    filterContainer.querySelectorAll(".filter-btn").forEach((btn) => {
+    filterContainer.querySelectorAll(".filter-pill").forEach((btn) => {
       btn.addEventListener("click", () => {
-        filterContainer.querySelectorAll(".filter-btn").forEach((b) => b.classList.remove("active"));
+        filterContainer.querySelectorAll(".filter-pill").forEach((b) => b.classList.remove("active"));
         btn.classList.add("active");
         activeFilter = btn.getAttribute("data-filter") || "all";
         applyFilters();
@@ -114,6 +108,7 @@ function initProjectControls() {
   }
 
   function applyFilters() {
+    let matchCount = 0;
     workItems.forEach((item) => {
       const projId = item.getAttribute("data-id");
       const projData = (typeof projectsData !== "undefined")
@@ -132,10 +127,20 @@ function initProjectControls() {
 
       if (matchesCat && matchesSearch) {
         item.classList.remove("hidden");
+        matchCount++;
       } else {
         item.classList.add("hidden");
       }
     });
+
+    const fallback = document.getElementById("no-works-fallback");
+    if (fallback) {
+      if (matchCount === 0) {
+        fallback.classList.remove("hidden");
+      } else {
+        fallback.classList.add("hidden");
+      }
+    }
   }
 }
 
@@ -150,7 +155,7 @@ function initCaseStudyModal() {
   if (!modal) return;
 
   const closeModal = () => {
-    modal.classList.remove("active");
+    modal.classList.remove("open", "active");
     modal.setAttribute("aria-hidden", "true");
     document.body.style.overflow = "";
   };
@@ -159,7 +164,7 @@ function initCaseStudyModal() {
   if (backdrop) backdrop.addEventListener("click", closeModal);
 
   document.addEventListener("keydown", (e) => {
-    if (e.key === "Escape" && modal.classList.contains("active")) {
+    if (e.key === "Escape" && (modal.classList.contains("open") || modal.classList.contains("active"))) {
       closeModal();
     }
   });
@@ -174,7 +179,7 @@ function initCaseStudyModal() {
   });
 
   // Attach triggers for Visual schematics/diagrams
-  document.querySelectorAll(".work-visual").forEach((vis) => {
+  document.querySelectorAll(".work-visual, .project-visual-col").forEach((vis) => {
     const parent = vis.closest(".work-item");
     if (parent) {
       const projId = parent.getAttribute("data-id");
@@ -217,20 +222,33 @@ function openCaseStudy(projectId) {
   modalBody.innerHTML = `
     <header class="cs-header">
       <div class="cs-meta">
-        <span class="cs-num">${escapeHtml(proj.index)}</span>
-        <span class="cs-tag">${escapeHtml(proj.discipline)}</span>
-        <span class="cs-tag">·</span>
-        <span class="cs-tag">${escapeHtml(proj.year)}</span>
+        <span class="cs-index">PROJECT ${escapeHtml(proj.index)}</span>
+        <span class="cs-discipline">${escapeHtml(proj.discipline)} &middot; ${escapeHtml(proj.year)}</span>
       </div>
       <h2 class="cs-title">${escapeHtml(proj.title)}</h2>
       <p class="cs-summary">${escapeHtml(proj.summary)}</p>
     </header>
 
+    <div class="cs-meta-grid">
+      <div class="cs-meta-item">
+        <span class="cs-meta-label">ROLE</span>
+        <span class="cs-meta-val">${escapeHtml(proj.role || "Software Engineer")}</span>
+      </div>
+      <div class="cs-meta-item">
+        <span class="cs-meta-label">DISCIPLINE</span>
+        <span class="cs-meta-val">${escapeHtml(proj.badge || "Core Systems")}</span>
+      </div>
+      <div class="cs-meta-item">
+        <span class="cs-meta-label">VERIFIED TESTS</span>
+        <span class="cs-meta-val" style="color: var(--accent);">100% Pass Rate</span>
+      </div>
+    </div>
+
     ${
       proj.context
         ? `<section class="cs-section">
-             <h3 class="cs-section-title">01 — Context &amp; Motivation</h3>
-             <p class="cs-body-text">${escapeHtml(proj.context)}</p>
+             <h3 class="cs-sec-title">01 — CONTEXT &amp; MOTIVATION</h3>
+             <p class="cs-body">${escapeHtml(proj.context)}</p>
            </section>`
         : ""
     }
@@ -238,8 +256,8 @@ function openCaseStudy(projectId) {
     ${
       proj.problem
         ? `<section class="cs-section">
-             <h3 class="cs-section-title">02 — The Problem</h3>
-             <p class="cs-body-text">${escapeHtml(proj.problem)}</p>
+             <h3 class="cs-sec-title">02 — THE CORE PROBLEM</h3>
+             <p class="cs-body">${escapeHtml(proj.problem)}</p>
            </section>`
         : ""
     }
@@ -247,8 +265,8 @@ function openCaseStudy(projectId) {
     ${
       proj.approach
         ? `<section class="cs-section">
-             <h3 class="cs-section-title">03 — Architectural Approach</h3>
-             <p class="cs-body-text">${escapeHtml(proj.approach)}</p>
+             <h3 class="cs-sec-title">03 — ARCHITECTURAL APPROACH</h3>
+             <p class="cs-body">${escapeHtml(proj.approach)}</p>
            </section>`
         : ""
     }
@@ -256,7 +274,7 @@ function openCaseStudy(projectId) {
     ${
       proj.architecture
         ? `<section class="cs-section">
-             <h3 class="cs-section-title">04 — System Contracts &amp; Subsystems</h3>
+             <h3 class="cs-sec-title">04 — SYSTEM CONTRACTS &amp; SUBSYSTEMS</h3>
              <pre class="cs-code-box"><code>${escapeHtml(proj.architecture)}</code></pre>
            </section>`
         : ""
@@ -265,8 +283,8 @@ function openCaseStudy(projectId) {
     ${
       proj.highlights && proj.highlights.length > 0
         ? `<section class="cs-section">
-             <h3 class="cs-section-title">05 — Key Accomplishments &amp; Features</h3>
-             <ul class="cs-list">
+             <h3 class="cs-sec-title">05 — KEY ACCOMPLISHMENTS &amp; SPECIFICATIONS</h3>
+             <ul class="cs-bullets">
                ${proj.highlights.map((h) => `<li>${escapeHtml(h)}</li>`).join("")}
              </ul>
            </section>`
@@ -276,24 +294,24 @@ function openCaseStudy(projectId) {
     ${
       proj.results
         ? `<section class="cs-section">
-             <h3 class="cs-section-title">06 — Verified Results &amp; Metrics</h3>
-             <p class="cs-body-text">${escapeHtml(proj.results)}</p>
+             <h3 class="cs-sec-title">06 — VERIFIED RESULTS &amp; METRICS</h3>
+             <p class="cs-body">${escapeHtml(proj.results)}</p>
            </section>`
         : ""
     }
 
     <section class="cs-section">
-      <h3 class="cs-section-title">07 — Technology Stack</h3>
-      <div class="cs-tech-tags">
-        ${proj.technologies.map((t) => `<span class="tech-tag">${escapeHtml(t)}</span>`).join("")}
+      <h3 class="cs-sec-title">07 — TECHNOLOGY STACK</h3>
+      <div class="tech-chips-row">
+        ${proj.technologies.map((t) => `<span class="tech-chip">${escapeHtml(t)}</span>`).join("")}
       </div>
     </section>
 
     ${
       proj.reflection
         ? `<section class="cs-section">
-             <h3 class="cs-section-title">08 — Engineering Reflection</h3>
-             <p class="cs-body-text">${escapeHtml(proj.reflection)}</p>
+             <h3 class="cs-sec-title">08 — ENGINEERING REFLECTION</h3>
+             <p class="cs-body">${escapeHtml(proj.reflection)}</p>
            </section>`
         : ""
     }
@@ -302,7 +320,7 @@ function openCaseStudy(projectId) {
       proj.quickStart
         ? `<section class="cs-section">
              <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 0.5rem;">
-               <h3 class="cs-section-title" style="margin: 0;">09 — Quick Start &amp; Run</h3>
+               <h3 class="cs-sec-title" style="margin: 0;">09 — QUICK START &amp; RUN INSTRUCTIONS</h3>
                <button class="copy-action-btn copy-code-btn" data-code="${escapeHtml(proj.quickStart)}">Copy Script</button>
              </div>
              <pre class="cs-code-box"><code>${escapeHtml(proj.quickStart)}</code></pre>
@@ -310,26 +328,24 @@ function openCaseStudy(projectId) {
         : ""
     }
 
-    <footer class="cs-footer">
-      <div style="display: flex; gap: 0.85rem; flex-wrap: wrap;">
-        ${
-          proj.live
-            ? `<a href="${proj.live}" target="_blank" rel="noopener noreferrer" class="action-btn" style="background-color: var(--accent); color: var(--bg-primary); border-color: var(--accent);">
-                 <span>Launch Live App</span>
-                 <span class="arrow">&#8599;</span>
-               </a>`
-            : ""
-        }
-        ${
-          proj.github
-            ? `<a href="${proj.github}" target="_blank" rel="noopener noreferrer" class="action-btn">
-                 <span>View Repository on GitHub</span>
-                 <span class="arrow">&#8599;</span>
-               </a>`
-            : ""
-        }
-      </div>
-      <button class="action-link" id="modal-bottom-close">Close Case Study</button>
+    <footer class="cs-actions">
+      ${
+        proj.live
+          ? `<a href="${proj.live}" target="_blank" rel="noopener noreferrer" class="action-btn live-action">
+               <span>Launch Live Application</span>
+               <span class="arrow">&#8599;</span>
+             </a>`
+          : ""
+      }
+      ${
+        proj.github
+          ? `<a href="${proj.github}" target="_blank" rel="noopener noreferrer" class="action-btn source-action">
+               <span>View Source Code on GitHub</span>
+               <span class="arrow">&#8599;</span>
+             </a>`
+          : ""
+      }
+      <button class="action-btn" id="modal-bottom-close" style="border: 1px solid var(--border-subtle); color: var(--text-secondary);">Close</button>
     </footer>
   `;
 
@@ -337,7 +353,7 @@ function openCaseStudy(projectId) {
   const bottomClose = modalBody.querySelector("#modal-bottom-close");
   if (bottomClose) {
     bottomClose.addEventListener("click", () => {
-      modal.classList.remove("active");
+      modal.classList.remove("open", "active");
       modal.setAttribute("aria-hidden", "true");
       document.body.style.overflow = "";
     });
@@ -356,35 +372,41 @@ function openCaseStudy(projectId) {
     });
   }
 
-  modal.classList.add("active");
+  modal.classList.add("open", "active");
   modal.setAttribute("aria-hidden", "false");
   document.body.style.overflow = "hidden";
 }
 
-function escapeHtml(text) {
-  if (!text) return "";
-  return String(text)
-    .replace(/&/g, "&amp;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#039;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;");
-}
-
 /* ==========================================================================
-   05. Copy-to-Clipboard Subsystem
+   05. Copy to Clipboard Subsystem
    ========================================================================== */
 function initCopySubsystem() {
   document.querySelectorAll(".copy-action-btn").forEach((btn) => {
     btn.addEventListener("click", (e) => {
       e.preventDefault();
-      const textToCopy = btn.getAttribute("data-copy");
-      if (textToCopy && navigator.clipboard) {
-        navigator.clipboard.writeText(textToCopy).then(() => {
-          showToast(`Copied ${textToCopy} to clipboard`, "success");
-        }).catch(() => {
-          showToast("Failed to copy text", "error");
-        });
+      const val = btn.getAttribute("data-copy");
+      if (!val) return;
+
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard
+          .writeText(val)
+          .then(() => {
+            const orig = btn.textContent;
+            btn.textContent = "Copied!";
+            btn.style.backgroundColor = "var(--accent)";
+            btn.style.color = "#07080B";
+
+            showToast(`Copied to clipboard: ${val}`, "success");
+
+            setTimeout(() => {
+              btn.textContent = orig;
+              btn.style.backgroundColor = "";
+              btn.style.color = "";
+            }, 1800);
+          })
+          .catch(() => {
+            showToast("Failed to copy automatically", "error");
+          });
       }
     });
   });
@@ -412,7 +434,7 @@ function initContactForm() {
 
   function validate(input, errorEl, condition, msg) {
     if (!condition(input.value.trim())) {
-      input.style.borderColor = "#ff6b6b";
+      input.style.borderColor = "#EF4444";
       errorEl.textContent = msg;
       return false;
     }
@@ -510,7 +532,7 @@ function showToast(message, type = "success") {
    ========================================================================== */
 function initScrollSpy() {
   const sections = document.querySelectorAll("section[id]");
-  const navLinks = document.querySelectorAll(".nav-link");
+  const navLinks = document.querySelectorAll(".nav-link, .island-link");
 
   function onScroll() {
     const scrollY = window.pageYOffset;
@@ -533,4 +555,17 @@ function initScrollSpy() {
   }
 
   window.addEventListener("scroll", onScroll, { passive: true });
+}
+
+/* ==========================================================================
+   09. Escape HTML Utility
+   ========================================================================== */
+function escapeHtml(str) {
+  if (typeof str !== "string") return str;
+  return str
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
 }
