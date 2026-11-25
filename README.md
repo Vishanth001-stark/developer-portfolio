@@ -36,7 +36,7 @@ An aesthetic, intuitive developer portfolio for **Vishanth R** (B.Tech in CSE �
   - Interactive Code Window: Syntax-highlighted developer object with window dots (🔴 🟡 🟢).
 - **About Me & Education:**
   - Bio with key focus areas (AI, Data Engineering, OOP, Web Systems).
-  - Personal info chips: Location (Bengaluru), Phone (`+91 96777 30223`), Email (`vishantra@gmail.com`), Languages, DOB, Nationality.
+  - Personal info chips: Location (Bengaluru), Phone (`+91 96777 30223`), Email (`vishanthra@gmail.com`), Languages, DOB, Nationality.
   - Academic Journey Timeline: Jain University (CGPA 7.17), Sri Chaitanya PU College (Class XII, 63.2%), Mount Litera Zee School (Class X, 74%).
   - Undergraduate Key Coursework chips.
 - **Technical Skills:**
